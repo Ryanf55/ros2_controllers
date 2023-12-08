@@ -40,12 +40,16 @@
  */
 
 #include "path_following_controllers/npfg.hpp"
+
+#include <cmath>
 // #include <lib/geo/geo.h>
 // #include <px4_platform_common/defines.h>
 // #include <float.h>
 
 // using matrix::Vector2d;
 // using Eigen::Vector2f;
+
+static constexpr float CONSTANTS_ONE_G = 9.80665f; // m/s^2
 
 // float NPFG::canRun(const vehicle_local_position_s &local_pos, const bool is_wind_valid) const
 // {
@@ -192,7 +196,7 @@
 
 // 			const float period_ub = periodUpperBound(air_turn_rate, wind_factor, feas_on_track);
 
-// 			if (en_period_ub_ && PX4_ISFINITE(period_ub) && period > period_ub) {
+// 			if (en_period_ub_ && std::isfinite(period_ub) && period > period_ub) {
 // 				// NOTE: if the roll time constant is not accurately known, reducing
 // 				// the period here can destabilize the system!
 // 				// enable this feature at your own risk!
@@ -497,12 +501,12 @@
 // 	return math::min(wp_radius, track_error_bound_ * switch_distance_multiplier_);
 // } // switchDistance
 
-// void NPFG::updateRollSetpoint()
-// {
-// 	float roll_new = atanf(lateral_accel_ * 1.0f / CONSTANTS_ONE_G);
-// 	roll_new = std::clamp(roll_new, -roll_lim_rad_, roll_lim_rad_);
+void NPFG::updateRollSetpoint()
+{
+	float roll_new = atanf(lateral_accel_ * 1.0f / CONSTANTS_ONE_G);
+	roll_new = std::clamp(roll_new, -roll_lim_rad_, roll_lim_rad_);
 
-// 	if (PX4_ISFINITE(roll_new)) {
-// 		roll_setpoint_ = roll_new;
-// 	}
-// } // updateRollSetpoint
+	if (std::isfinite(roll_new)) {
+		roll_setpoint_ = roll_new;
+	}
+} // updateRollSetpoint
