@@ -42,6 +42,8 @@
 #include "path_following_controllers/npfg.hpp"
 
 #include <cmath>
+#include <Eigen/Geometry>
+
 
 static constexpr float CONSTANTS_ONE_G = 9.80665f; // m/s^2
 
@@ -53,8 +55,6 @@ inline float cross(const Eigen::Vector2f &a, const Eigen::Vector2f &b)
 {
 	return a(0) * b(1) - a(1) * b(0);
 }
-
-// TODO add Dcm2.hpp, or just a rotation matrix if it will work the same
 
 float NPFG::canRun(const vehicle_local_position_s &local_pos, const bool is_wind_valid) const
 {
@@ -72,9 +72,10 @@ float NPFG::canRun(const vehicle_local_position_s &local_pos, const bool is_wind
 					    0.f, 1.f));
 
 	// Check that the angle between heading and track is not off too much. if it is greater than 90° we will be pushed back from the wind and the npfg will propably give a roll command in the wrong direction.
-	const Eigen::Vector2f heading_vector(matrix::Dcm2f(local_pos.heading)*Eigen::Vector2f({1.f, 0.f}));
+	const Eigen::Rotation2D<float> dcm(local_pos.heading);
+	const Eigen::Vector2f heading_vector(dcm * Eigen::Vector2f({1.f, 0.f}));
 	const Eigen::Vector2f ground_vel_norm(ground_vel.normalized());
-	const float flying_forward_factor(std::clamp((dot(heading_vector, ground_vel_norm) -
+	const float flying_forward_factor(std::clamp((heading_vector.dot(ground_vel_norm) -
 					  COS_HEADING_TRACK_ANGLE_PUSHED_BACK) / ((COS_HEADING_TRACK_ANGLE_NOT_PUSHED_BACK -
 							  COS_HEADING_TRACK_ANGLE_PUSHED_BACK)),
 					  0.f, 1.f));
