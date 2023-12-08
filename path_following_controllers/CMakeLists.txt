@@ -7,6 +7,7 @@ endif()
 
 
 find_package(ament_cmake REQUIRED)
+find_package (Eigen3 3.3 REQUIRED CONFIG)
 # find_package(backward_ros REQUIRED)
 # foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
 #   find_package(${Dependency} REQUIRED)
@@ -25,9 +26,9 @@ target_include_directories(npfg_controller PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
-# target_link_libraries(joint_trajectory_controller PUBLIC
-#   joint_trajectory_controller_parameters
-# )
+target_link_libraries(npfg_controller PUBLIC
+  Eigen3::Eigen
+)
 # ament_target_dependencies(joint_trajectory_controller PUBLIC ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 # # Causes the visibility macros to use dllexport rather than dllimport,
