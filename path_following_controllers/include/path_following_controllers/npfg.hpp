@@ -61,6 +61,7 @@
 #define NPFG_H_
 
 #include <algorithm> // std:max, std::clamp
+#include <numbers> // std::numbers::pi
 #include <Eigen/Core>
 // #include <matrix/math.hpp>
 // #include <lib/mathlib/mathlib.h>
@@ -352,7 +353,7 @@ private:
 	 * ECL_L1_Pos_Controller functionality
 	 */
 
-	float roll_lim_rad_{30.0f * 3.14f / 180.0f }; // maximum roll angle [rad]
+	float roll_lim_rad_{30.0f * std::numbers::pi_v<float> / 180.0f }; // maximum roll angle [rad]
 	float roll_setpoint_{0.0f}; // current roll angle setpoint [rad]
 
 	/*

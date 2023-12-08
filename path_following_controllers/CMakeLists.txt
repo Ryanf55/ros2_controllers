@@ -21,7 +21,7 @@ find_package (Eigen3 3.3 REQUIRED CONFIG)
 add_library(npfg_controller
   src/npfg.cpp
 )
-target_compile_features(npfg_controller PUBLIC cxx_std_17)
+target_compile_features(npfg_controller PUBLIC cxx_std_20)
 target_include_directories(npfg_controller PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
