@@ -76,17 +76,88 @@ class NPFG
 {
 
 public:
-// 	/**
-// 	 * @brief Can run
-// 	 *
-// 	 * Evaluation if all the necessary information are available such that npfg can produce meaningful results.
-// 	 *
-// 	 * @param[in] local_pos is the current vehicle local position uorb message
-// 	 * @param[in] is_wind_valid flag if the wind estimation is valid
-// 	 * @return estimate of certainty of the correct functionality of the npfg roll setpoint in [0, 1]. Can be used to define proper mitigation actions.
-// 	 */
 
-// 	float canRun(const vehicle_local_position_s &local_pos, bool is_wind_valid) const;
+	// https://github.com/Ryanf55/PX4-Autopilot/blob/cea185268e133ad22418fb9990f9c19df6e30681/msg/VehicleLocalPosition.msg
+	struct vehicle_local_position_s {
+		// Position in local NED frame
+		float x;	//			# North position in NED earth-fixed frame, (metres)
+		float y;//				# East position in NED earth-fixed frame, (metres)
+		float z;//				# Down position (negative altitude) in NED earth-fixed frame, (metres)
+
+		// Position reset delta
+		std::array<float,2> delta_xy;
+		uint8_t xy_reset_counter;
+
+		float delta_z;
+		uint8_t z_reset_counter;
+
+		// Velocity in NED frame
+		float vx; 				// North velocity in NED earth-fixed frame, (metres/sec)
+		float vy;				// East velocity in NED earth-fixed frame, (metres/sec)
+		float vz;				// Down velocity in NED earth-fixed frame, (metres/sec)
+		float z_deriv;				// Down position time derivative in NED earth-fixed frame, (metres/sec)
+
+		// Velocity reset delta
+		std::array<float,2>delta_vxy;
+		uint8_t vxy_reset_counter;
+
+		float delta_vz;
+		uint8_t vz_reset_counter;
+		// Acceleration in NED frame
+		float ax;        // North velocity derivative in NED earth-fixed frame, (metres/sec^2)
+		float ay;        // East velocity derivative in NED earth-fixed frame, (metres/sec^2)
+		float az;        // Down velocity derivative in NED earth-fixed frame, (metres/sec^2)
+
+		float heading;				// Euler yaw angle transforming the tangent plane relative to NED earth-fixed frame, -PI..+PI,  (radians)
+		float delta_heading;
+		uint8_t heading_reset_counter;
+		bool heading_good_for_control;
+
+		// Position of reference point (local NED frame origin) in global (GPS / WGS84) frame
+		bool xy_global;				// true if position (x, y) has a valid global reference (ref_lat, ref_lon)
+		bool z_global;				// true if z has a valid global reference (ref_alt)
+		uint64_t ref_timestamp;			// Time when reference position was set since system start, (microseconds)
+		double ref_lat;				// Reference point latitude, (degrees)
+		double ref_lon;			// Reference point longitude, (degrees)
+		float ref_alt;				// Reference altitude AMSL, (metres)
+
+		// Distance to surface
+		float dist_bottom;			// Distance from from bottom surface to ground, (metres)
+		bool dist_bottom_valid;			// true if distance to bottom surface is valid
+		uint8_t dist_bottom_sensor_bitfield;	// bitfield indicating what type of sensor is used to estimate dist_bottom
+		const uint8_t DIST_BOTTOM_SENSOR_NONE = 0;
+		const uint8_t DIST_BOTTOM_SENSOR_RANGE = 1;	// (1 << 0) a range sensor is used to estimate dist_bottom field
+		const uint8_t DIST_BOTTOM_SENSOR_FLOW = 2;	// (1 << 1) a flow sensor is used to estimate dist_bottom field (mostly fixed-wing use case)
+
+		float eph;				// Standard deviation of horizontal position error, (metres)
+		float epv;				// Standard deviation of vertical position error, (metres)
+		float evh;				// Standard deviation of horizontal velocity error, (metres/sec)
+		float evv;				// Standard deviation of vertical velocity error, (metres/sec)
+
+		bool dead_reckoning;                     // True if this position is estimated through dead-reckoning
+
+		// estimator specified vehicle limits
+		float vxy_max;				// maximum horizontal speed - set to 0 when limiting not required (meters/sec)
+		float vz_max;				// maximum vertical speed - set to 0 when limiting not required (meters/sec)
+		float hagl_min;			// minimum height above ground level - set to 0 when limiting not required (meters)
+		float hagl_max;			// maximum height above ground level - set to 0 when limiting not required (meters)
+
+		// TOPICS vehicle_local_position vehicle_local_position_groundtruth
+		// TOPICS estimator_local_position
+	};
+
+
+	/**
+	 * @brief Can run
+	 *
+	 * Evaluation if all the necessary information are available such that npfg can produce meaningful results.
+	 *
+	 * @param[in] local_pos is the current vehicle local position uorb message
+	 * @param[in] is_wind_valid flag if the wind estimation is valid
+	 * @return estimate of certainty of the correct functionality of the npfg roll setpoint in [0, 1]. Can be used to define proper mitigation actions.
+	 */
+
+	float canRun(const vehicle_local_position_s &local_pos, bool is_wind_valid) const;
 	/*
 	 * Computes the lateral acceleration and airspeed references necessary to track
 	 * a path in wind (including excess wind conditions).
