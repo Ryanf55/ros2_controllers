@@ -276,7 +276,7 @@ private:
 	static constexpr float COS_HEADING_TRACK_ANGLE_NOT_PUSHED_BACK{0.09f}; ///< Cos of Heading to track angle below which it is assumed that the vehicle is not pushed back by the wind ~cos(85°)
 	static constexpr float COS_HEADING_TRACK_ANGLE_PUSHED_BACK{0.f}; ///< Cos of Heading to track angle above which it is assumed that the vehicle is pushed back by the wind
 
-	static constexpr float NPFG_EPSILON = 1.0e-6; // small number *bigger than machine epsilon
+	static constexpr float NPFG_EPSILON = 1.0e-6f; // small number *bigger than machine epsilon
 	static constexpr float MIN_RADIUS = 0.5f; // minimum effective radius (avoid singularities) [m]
 	static constexpr float NTE_FRACTION = 0.5f; // normalized track error fraction (must be > 0)
 	// ^determines at what fraction of the normalized track error the maximum track keeping forward ground speed demand is reached
